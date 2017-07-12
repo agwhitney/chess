@@ -1,11 +1,13 @@
 """Piece class and the subclasses for each piece, and the initialize_pieces function for placing the
-pieces at the beginning of the game
+pieces at the beginning of the game.
 """
 from game_states import Team
 
 
 class Piece:
-    """Piece object containing properties about the pieces."""
+    """Piece object containing properties about the pieces.
+    Child classes contain the legal moves; Parent class contains the move function.
+    """
     def __init__(self, x, y, color, name, symbol, moves_made=0):
         self.x = x
         self.y = y

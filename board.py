@@ -13,10 +13,15 @@ class Board:
 
         color = Team.WHITE
         for y in range(self.height):
+            columns = []
             for x in range(self.width):
-                squares.append(Square(x, y, color))
+                columns.append(Square(x, y, color))
                 color = switch_teams(color)
 
+            squares.append(columns)
             color = switch_teams(color)
 
         return squares
+
+    def piece_in_square(self, x, y):
+        return self.squares[x][y].piece_present
