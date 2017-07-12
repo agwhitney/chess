@@ -23,6 +23,7 @@ class Piece:
 
     def move(self, new_x, new_y):
         self.x, self.y = new_x, new_y
+        self.moves_made += 1
 
 
 class Pawn(Piece):

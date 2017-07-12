@@ -10,6 +10,12 @@ def main():
     pieces = initialize_pieces()
 
     draw_board(game_board, pieces)
+    # While True loop for the game:
+    # All it really has to do is take input,
+    # convert it into a move,
+    # check the legality (done by the piece, I think),
+    # and make the move.
+    # And then change the turn, I guess.
 
 
 if __name__ == '__main__':
