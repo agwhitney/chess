@@ -1,16 +1,15 @@
 from board import Board
-from render_functions import draw_board
-from pieces import Pawn
-from game_states import Team
+from draw_board import draw_board
+from pieces import initialize_pieces
 
 
 def main():
     game_board = Board()
     game_board.initialize_squares()
 
-    p = Pawn(2, 1, Team.WHITE)
-    game_board.place_pieces([p])
-    draw_board(game_board)
+    pieces = initialize_pieces()
+
+    draw_board(game_board, pieces)
 
 
 if __name__ == '__main__':
