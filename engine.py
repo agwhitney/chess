@@ -17,6 +17,9 @@ def main():
     # and make the move.
     # And then change the turn, I guess.
 
+    while True:
+        break
+
 
 if __name__ == '__main__':
     main()
