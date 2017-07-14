@@ -2,7 +2,7 @@
 pieces at the beginning of the game.
 """
 from game_states import Team
-
+from itertools import product
 
 class Piece:
     """Piece object containing properties about the pieces.
@@ -23,9 +23,9 @@ class Piece:
     def __repr__(self):
         return "<{} {} at ({}, {})>".format(self.color, self.name, self.x, self.y)
 
-    def move(self, new_x, new_y):
-        self.x, self.y = new_x, new_y
-        self.moves_made += 1
+    def move(self, x2, y2):
+        pass
+
 
 
 class Pawn(Piece):

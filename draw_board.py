@@ -4,7 +4,7 @@ def draw_board(game_board, pieces):
 
     print(letters)
     for y in range(game_board.height):
-        print(' {} '.format(y), end='')
+        print(' {} '.format(y + 1), end='')
 
         for x in range(game_board.width):
             for piece in pieces:
@@ -17,5 +17,5 @@ def draw_board(game_board, pieces):
                 print(game_board.squares[x][y].symbol, end='')
                 game_board.squares[x][y].piece_present = None
 
-        print(' {} '.format(y))     # No end='' creates the newline
+        print(' {} '.format(y + 1))     # No end='' creates the newline
     print(letters)
