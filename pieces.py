@@ -21,7 +21,7 @@ class Piece:
             self.symbol = symbol
 
     def __repr__(self):
-        return "<{} {} ({})>".format(self.color, self.name, self.symbol)
+        return "<{} {} at ({}, {})>".format(self.color, self.name, self.x, self.y)
 
     def move(self, new_x, new_y):
         self.x, self.y = new_x, new_y
@@ -30,33 +30,33 @@ class Piece:
 
 class Pawn(Piece):
     def __init__(self, x, y, color, passant=False):
-        super().__init__(x, y, color, 'pawn', '[P]')
+        super().__init__(x, y, color, 'Pawn', '[P]')
         self.passant = passant
 
 
 class Rook(Piece):
     def __init__(self, x, y, color):
-        super().__init__(x, y, color, 'rook', '[R]')
+        super().__init__(x, y, color, 'Rook', '[R]')
 
 
 class Knight(Piece):
     def __init__(self, x, y, color):
-        super().__init__(x, y, color, 'knight', '[N]')
+        super().__init__(x, y, color, 'Knight', '[N]')
 
 
 class Bishop(Piece):
     def __init__(self, x, y, color):
-        super().__init__(x, y, color, 'bishop', '[B]')
+        super().__init__(x, y, color, 'Bishop', '[B]')
 
 
 class King(Piece):
     def __init__(self, x, y, color):
-        super().__init__(x, y, color, 'king', '[K]')
+        super().__init__(x, y, color, 'King', '[K]')
 
 
 class Queen(Piece):
     def __init__(self, x, y, color):
-        super().__init__(x, y, color, 'queen', '[Q]')
+        super().__init__(x, y, color, 'Queen', '[Q]')
 
 
 def initialize_pieces():

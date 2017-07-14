@@ -1,6 +1,7 @@
 from board import Board
 from draw_board import draw_board
 from pieces import initialize_pieces
+from cast_ray import cardinals, ordinals, step, cast_ray
 
 
 def main():
