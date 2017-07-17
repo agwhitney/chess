@@ -32,13 +32,12 @@ class Board:
         """A key for converting algebraic coordinates into cartesian coordinates.
         key['A4'] = (0, 3)]
         """
-        # TODO FIX THIS
         key = {}
         letters = [chr(i) for i in range(65, 65 + self.width)]
         numbers = [str(i + 1) for i in range(self.height)]
 
-        algebraic = [i + j for i, j in zip(letters, numbers)]
         cartesian = product(range(self.width), range(self.height))
+        algebraic = [l + n for l, n in product(letters, numbers)]
 
         for alg, car in zip(algebraic, cartesian):
             key[alg] = car
@@ -48,6 +47,3 @@ class Board:
     def piece_in_square(self, x, y):
         """Returns a piece object present in (x, y); or None."""
         return self.squares[x][y].piece_present
-
-b = Board()
-print(b.key)

@@ -6,6 +6,7 @@ Cardinals and Ordinals and Radial are separate for clarity when they're called i
 
 
 def cardinals(piece, board):
+    """cast_ray() in the four cardinal directions"""
     legal_squares = []
 
     for direction in ['north', 'south', 'east', 'west']:
@@ -16,6 +17,7 @@ def cardinals(piece, board):
 
 
 def ordinals(piece, board):
+    """cast_ray() in the four ordinal directions"""
     legal_squares = []
 
     for direction in ['northeast', 'northwest', 'southeast', 'southwest']:
@@ -26,6 +28,7 @@ def ordinals(piece, board):
 
 
 def radial(piece, board):
+    """cast_ray() in all eight compass directions"""
     legal_squares = []
 
     legal_squares.extend(cardinals(piece, board))
@@ -51,6 +54,10 @@ def cast_ray(piece, board, direction):
 
         elif target.color != piece.color:
             legal_squares.append(square)
+
+            if target.name == 'King':
+                target.checked = True
+
             break
 
         else:
@@ -61,7 +68,6 @@ def cast_ray(piece, board, direction):
 
 def step(x, y, direction):
     """Returns the coordinates a step in a given direction away from the origin.
-    Potential issue of having squares outside of the board?
     """
     directions = {
         'north': (x, y - 1),

@@ -2,6 +2,7 @@ from board import Board
 from draw_board import draw_board
 from pieces import initialize_pieces
 from game_states import Team, switch_teams
+from move_functions import move
 
 
 def main():
@@ -14,19 +15,12 @@ def main():
 
     player_turn = Team.WHITE
 
-    # While True loop for the game:
-    # All it really has to do is take input,
-    # convert it into a move,
-    # check the legality (done by the piece, I think),
-    # and make the move.
-    # And then change the turn, I guess.
     while True:
-
-        prompt = input()
+        prompt = input("Starting and Ending Coordinates, separated by a space.\n").upper().split()
+        move(game_board, pieces, player_turn, prompt[0], prompt[1])
 
         draw_board(game_board, pieces)  # TODO Flip the board for the second player
         player_turn = switch_teams(player_turn)
-        break
 
 
 if __name__ == '__main__':
