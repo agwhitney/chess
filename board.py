@@ -7,8 +7,8 @@ class Board:
     def __init__(self, width=8, height=8):
         self.width = width
         self.height = height
-        self.squares = self.initialize_squares()
-        self.key = self.create_key()
+        self.squares = self.initialize_squares()    # list of tuple coordinates
+        self.key = self.create_key()                # dict(str(alg_coord) : tuple(coordinate))
 
     def initialize_squares(self):
         """Returns width * height nested list of squares.

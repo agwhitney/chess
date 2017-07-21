@@ -2,7 +2,6 @@
 The ray gathers information along a path and returns the last square, or (if there's an ally there) the one before it.
 Cardinals and Ordinals and Radial are separate for clarity when they're called in other places.
 """
-# TODO Add a 'check' flag. The king can't move into check, so it should use the ray functions to check the desired move
 
 
 def cardinals(piece, board):
@@ -54,14 +53,6 @@ def cast_ray(piece, board, direction):
 
         elif target.color != piece.color:
             legal_squares.append(square)
-
-            if target.name == 'King':
-                target.checked = True
-
-            break
-
-        else:
-            break
 
     return legal_squares
 
