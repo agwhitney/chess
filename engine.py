@@ -32,10 +32,8 @@ def main():
             if piece.captured is True:
                 pieces.remove(piece)
 
-
         # Move -I just do it somewhere else
         prompt = input("Starting and Ending Coordinates, separated by a space.\n").upper().split()
-        move(game_board, pieces, player_turn, prompt[0], prompt[1])
 
         # Cleanup
         draw_board(game_board, pieces)  # TODO Flip the board for the second player

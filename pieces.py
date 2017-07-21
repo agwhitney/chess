@@ -31,7 +31,7 @@ class Pawn(Piece):
         super().__init__(x, y, color, 'Pawn', '[P]')
         self.passant = passant
 
-    def legal_moves(self, board):
+    def legal_moves(self, board, only_diagonals=False):
         legal_squares = []
         forward = 'north' if self.color == Team.WHITE else 'south'
 
@@ -50,9 +50,9 @@ class Pawn(Piece):
         for side in ['east', 'west']:
             # Diagonal
             diagonal = step(self.x, self.y, forward + side)
-            target_dgn = board.piece_in_square(diagonal[0], diagonal[1])
-            if target_dgn:
-                if target_dgn.color != self.color:
+            target_dgnl = board.piece_in_square(diagonal[0], diagonal[1])
+            if target_dgnl:
+                if target_dgnl.color != self.color:
                     legal_squares.append(diagonal)
 
             # Passant
@@ -62,6 +62,12 @@ class Pawn(Piece):
                 if target_lat.name == 'Pawn' and target_lat.passant is True and target_lat.color != self.color:
                     legal_squares.append(diagonal)
                     target_lat.captured = True
+
+        # Remove non-diagonal squares (used for check checking)
+        if only_diagonals is True:
+            for square in legal_squares:
+                if square[1] == self.y:
+                    legal_squares.remove(square)
 
         return legal_squares
 
@@ -147,6 +153,21 @@ class King(Piece):
 
             if square not in board.squares:
                 legal_moves.remove(square)
+
+    def in_check(self, board, pieces):
+        """Checks whether or not a king is in check at its position by creating a list of dangerous squares
+        and seeing if the king is in them.
+        """
+        danger_zone = []
+        for piece in pieces:
+            if piece.color != self.color and piece.name == 'Pawn':
+                danger_zone.extend(piece.legal_moves(board, only_diagonals=True))
+
+            elif piece.color != self.color:
+                danger_zone.extend(piece.legal_moves(board))
+
+        if (self.x, self.y) in danger_zone:
+            self.checked = True
 
 
 class Queen(Piece):
