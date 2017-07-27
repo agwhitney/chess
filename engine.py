@@ -1,43 +1,48 @@
 from board import Board
 from draw_board import draw_board
-from pieces import initialize_pieces
+from pieces import initialize_pieces, return_king
 from game_states import Team, switch_teams
-from move_functions import move
 
 
 def main():
     game_board = Board()
     game_board.initialize_squares()
-
     pieces = initialize_pieces()
 
     draw_board(game_board, pieces)
-
     player_turn = Team.WHITE
 
+    # ----------------
+    # ENGINE LOOP
+    # ----------------
     while True:
-        """Parts of a turn:
-        Reset: Remove Captured=True pieces; Reset team's pawns to passant=False; create state of object data
-        Move: Use the move function and do a legal move (checked by the pieces)
-        Cleanup: Promote any pawns; check for a checked king.
-            If needed (you put yourself in check) reset to the state and just loop again without changing turns
-        Issues for the future: checkmate? Maybe create a list of danger squares from enemy and safe squares from you
-        """
-        # Reset phase
+        # Reset and clean up corpses
         for piece in pieces:
-            if piece.name == 'Pawn':
-                if piece.passant is True:
-                    piece.passant = False
-
             if piece.captured is True:
                 pieces.remove(piece)
 
-        # Move -I just do it somewhere else
-        prompt = input("Starting and Ending Coordinates, separated by a space.\n").upper().split()
+            if piece.name == 'Pawn' and piece.color == player_turn:
+                if piece.passant is True:
+                    piece.passant = False
 
-        # Cleanup
-        draw_board(game_board, pieces)  # TODO Flip the board for the second player
-        player_turn = switch_teams(player_turn)
+        player_king = return_king(pieces, player_turn)
+
+        # Move
+        print("It is {}'s turn".format(player_turn))
+        start, end = input("Starting and Ending Coordinates, separated by a space.\n").upper().split()
+
+        if start == 'CASTLE':
+            pass    # function for castling
+
+        else:
+            x1, y1 = game_board.key[start]
+            x2, y2 = game_board.key[end]
+
+            piece = game_board.piece_in_square(x1, y1)
+            piece.move(x2, y2, game_board)
+
+            player_turn = switch_teams(player_turn)
+            draw_board(game_board, pieces)
 
 
 if __name__ == '__main__':

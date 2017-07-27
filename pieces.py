@@ -25,6 +25,14 @@ class Piece:
     def __repr__(self):
         return "<{} {} at ({}, {})>".format(self.color, self.name, self.x, self.y)
 
+    def move(self, x2, y2, board):
+        self.x = x2
+        self.y = y2
+
+        target = board.piece_in_square(x2, y2)
+        if target:
+            target.captured = True  # Friendly check handled in legal_moves
+
 
 class Pawn(Piece):
     def __init__(self, x, y, color, passant=False):
@@ -93,8 +101,9 @@ class Knight(Piece):
 
     def legal_moves(self, board):
         """Legal squares determined by taking all the options as a list, then removing options
-        as necessary (i.e. not in board or team-occupied)."""
-        legal_squares = [
+        as necessary (i.e. not in board or team-occupied) and returning a new list.
+        """
+        potential_squares = [
             (self.x + 2, self.y + 1),
             (self.x + 2, self.y - 1),
             (self.x - 2, self.y + 1),
@@ -104,15 +113,15 @@ class Knight(Piece):
             (self.x + 1, self.y - 2),
             (self.x - 1, self.y - 2)
         ]
-
-        for square in legal_squares:
+        legal_squares = []
+        for square in potential_squares:
             target = board.piece_in_square(square[0], square[1])
             if target:
-                if target.color == self.color:
-                    legal_squares.remove(square)
+                if target.color != self.color:
+                    legal_squares.append(square)
 
-            if square not in board.squares:
-                legal_squares.remove(square)
+            if square in board.square_coordinates():
+                legal_squares.append(square)
 
         return legal_squares
 
@@ -134,7 +143,7 @@ class King(Piece):
         """Added explicitly then removed as appropriate.
         Checks are (will be) determined at the end of a turn in a separate place
         """
-        legal_moves = [
+        potential_squares = [
             step(self.x, self.y, 'north'),
             step(self.x, self.y, 'south'),
             step(self.x, self.y, 'east'),
@@ -144,15 +153,15 @@ class King(Piece):
             step(self.x, self.y, 'southeast'),
             step(self.x, self.y, 'southwest'),
         ]
-
-        for square in legal_moves:
+        legal_squares = []
+        for square in potential_squares:
             target = board.piece_in_square(square[0], square[1])
             if target:
-                if self.color == target.color:
-                    legal_moves.remove(square)
+                if self.color != target.color:
+                    legal_squares.append(square)
 
-            if square not in board.squares:
-                legal_moves.remove(square)
+            if square in board.square_coordinates():
+                legal_squares.append(square)
 
     def in_check(self, board, pieces):
         """Checks whether or not a king is in check at its position by creating a list of dangerous squares
@@ -160,14 +169,17 @@ class King(Piece):
         """
         danger_zone = []
         for piece in pieces:
-            if piece.color != self.color and piece.name == 'Pawn':
+            if piece.color == self.color or piece == self:
+                continue
+
+            elif piece.name == 'Pawn':
                 danger_zone.extend(piece.legal_moves(board, only_diagonals=True))
 
-            elif piece.color != self.color:
+            else:
                 danger_zone.extend(piece.legal_moves(board))
 
         if (self.x, self.y) in danger_zone:
-            self.checked = True
+            return True
 
 
 class Queen(Piece):
@@ -206,3 +218,10 @@ def initialize_pieces():
             pieces.append(King(x, 7, Team.WHITE))
 
     return pieces
+
+
+def return_king(pieces, player_turn):
+    """Returns the player's king"""
+    for piece in pieces:
+        if piece.color == player_turn and piece.name == 'King':
+            return piece

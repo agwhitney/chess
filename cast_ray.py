@@ -38,7 +38,7 @@ def radial(piece, board):
 
 def cast_ray(piece, board, direction):
     """Casts a ray in one direction by iterating in steps in that direction.
-    Returns a list of legal squares (in that direction).
+    Returns a list of legal square coordinates (in that direction).
     """
     dx, dy = step(piece.x, piece.y, direction)
     legal_squares = []
@@ -48,11 +48,16 @@ def cast_ray(piece, board, direction):
         target = board.piece_in_square(dx, dy)
 
         if not target:
-            legal_squares.append(square)
+            legal_squares.append((square.x, square.y))
             dx, dy = step(dx, dy, direction)
+            continue
 
         elif target.color != piece.color:
-            legal_squares.append(square)
+            legal_squares.append((square.x, square.y))
+            break
+
+        else:
+            break
 
     return legal_squares
 

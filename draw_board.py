@@ -1,5 +1,8 @@
 def draw_board(board, pieces):
-    """Prints a formatted board, and should be flexible (aside from the labels) to any height/width."""
+    """Prints a w*h formatted board.
+    As is, row numbers are flexible, but column letters are explicit and only go to H.
+    Also updates the board.squares.piece_present attribute with the piece or with None.
+    """
     letters = '    A  B  C  D  E  F  G  H'  # This is explicit. ...for now? (that's four spaces)
 
     print(letters)
@@ -12,8 +15,8 @@ def draw_board(board, pieces):
                     print(piece.symbol, end='')
                     board.squares[x][y].piece_present = piece
                     break
-            # For-else: else runs if for doesn't break (ie if there's no piece at x,y)
-            else:
+
+            else:   # no break; i.e. if there's no piece at that coordinate
                 print(board.squares[x][y].symbol, end='')
                 board.squares[x][y].piece_present = None
 
