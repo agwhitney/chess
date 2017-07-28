@@ -43,8 +43,8 @@ def cast_ray(piece, board, direction):
     dx, dy = step(piece.x, piece.y, direction)
     legal_squares = []
 
-    while 0 <= dx <= board.width and 0 <= dy <= board.height:
-        square = board.squares[dx][dy]
+    while (dx, dy) in board.square_coordinates():
+        square = board.square(dx, dy)
         target = board.piece_in_square(dx, dy)
 
         if not target:

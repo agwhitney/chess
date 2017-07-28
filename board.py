@@ -8,8 +8,7 @@ class Board:
         self.width = width
         self.height = height
         self.key = self.create_key()                # dict(str(alg_coord) : tuple(coordinate))
-        self.squares = self.initialize_squares()    # list of list - tuple coordinates
-        self.squares_1d = [square for col in self.squares for square in col]
+        self.squares_list = self.initialize_squares()
 
     def create_key(self):
         """A key for converting algebraic coordinates into cartesian coordinates.
@@ -28,36 +27,31 @@ class Board:
         return key
 
     def initialize_squares(self):
-        """Returns width * height nested list of squares.
-        Loop x then y because it will be called as squares[x][y].
-        """
+        """1-D list of square objects"""
         squares = []
-
-        color = Team.WHITE
         for x in range(self.width):
-            columns = []
             for y in range(self.height):
-                columns.append(Square(x, y, color))
-                color = switch_teams(color)
-
-            squares.append(columns)
-            color = switch_teams(color)
-
+                color = Team.WHITE if (x + y) % 2 else Team.BLACK
+                squares.append(Square(x, y, color))
         return squares
 
     def piece_in_square(self, x, y):
-        """Returns the piece in square (x, y) or None by searching through the flattened
-        list of squares.
+        """Returns the piece in square (x, y), which is None by default.
+        Pieces are placed into squares in the draw_board method.
         """
-        for square in self.squares_1d:
-            if x == square.x and y == square.y:
-                return self.squares[x][y].piece_present
+        for square in self.squares_list:
+            if square.x == x and square.y == y:
+                return square.piece_present
 
-        return None     # If square isn't there
-
-    def generate_square_coords(self):
+    def square_coordinates(self):
         """Generator of tuples of the square coordinates - useful for looping over.
         Do I use it, though?
         """
-        for square in self.squares_1d:
-            yield square.x, square.y
+        for square in self.squares_list:
+            yield (square.x, square.y)
+
+    def square(self, x, y):
+        """Returns the SQUARE OBJECT at (x, y)."""
+        for square in self.squares_list:
+            if square.x == x and square.y == y:
+                return square
