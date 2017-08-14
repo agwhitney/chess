@@ -1,7 +1,8 @@
 from board import Board
+from cast_ray import castling_path_clear
 from draw_board import draw_board
-from teams import Team, switch_teams
 from pieces import initialize_pieces, return_king
+from teams import Team, switch_teams
 
 
 def main():
@@ -36,18 +37,75 @@ def main():
         # Present turn info and gather player's move input
         if message:
             print(message)
+            message = None  # Clear the message variable
+
         print("It is {}'s turn".format(player_turn))
         player_input = input("Starting and Ending Coordinates, separated by a space.\n" +
-                             "Type 'castle 0|8' to castle with the Rook at that position.\n").upper().split()
-        start, end = player_input[0], player_input[1]   # They can type whatever but I'm only taking the first 2 words
+                             "Type 'castle east|west' to castle with the Rook in that direction.\n"
+                             ).upper().split()
+        try:
+            start, end = player_input[0], player_input[1]
+        except IndexError:
+            message = "Try typing that out again?"
+            continue
+
+        # MOVE HANDLING
 
         # Castling
-        if start == 'CASTLE':   # TODO handling castling
-            pass
+        if start == 'CASTLE':
+            # Determine the rook in question
+            rook_y = 0 if player_turn == Team.BLACK else 7
+            if end == 'WEST':
+                rook = game_board.piece_in_square(0, rook_y)
+            elif end == 'EAST':
+                rook = game_board.piece_in_square(7, rook_y)
+            else:
+                message = "Please specify a direction ('east' or 'west')."
+                continue
+
+            # Has either piece moved?
+            if active_king.moves_made > 0 or rook.moves_made > 0:
+                message = "One or both of the pieces has moved previously."
+                continue
+
+            # Is the path clear?
+            if not castling_path_clear(active_king, rook, game_board, end.lower()):  # TODO normalize uppercase?
+                message = "The path between the king and rook isn't clear."
+                continue
+
+            # Is the king in check?
+            if active_king.in_check(game_board, pieces):
+                message = "You can't castle out of check!"
+                continue
+
+            # Looks good!
+            king_previous = active_king.x
+            rook_previous = rook.x
+            if end == 'WEST':
+                active_king.x -= 2
+                rook.x = active_king.x + 1
+
+            elif end == 'EAST':
+                active_king.x += 2
+                rook.x = active_king.x - 1
+
+            # Did you put your king in check?
+            if active_king.in_check(game_board, pieces):
+                message = "That move puts your own king in check."
+                active_king.x = king_previous
+                rook.x = rook_previous
+                continue
+
+            # Did you put their king in check?
+            if inactive_king.in_check(game_board, pieces):
+                message = "The {} King is in check!".format(inactive_king.color)
+
+            # Everything went smoothly!
+            active_king.moves_made += 1     # Castling is considered a king's move, so I've omitted adding to the rook
             player_turn = switch_teams(player_turn)
 
         # Standard Move
-        else:
+        elif start in game_board.key and end in game_board.key:
             x1, y1 = game_board.key[start]
             x2, y2 = game_board.key[end]
 
@@ -88,9 +146,12 @@ def main():
 
             # If the turn totally passes, then switch turns
             piece.moves_made += 1
-            message = None
             player_turn = switch_teams(player_turn)
 
+        # Mistake
+        else:
+            message = "Try typing that again?"
+            continue
 
 
 if __name__ == '__main__':

@@ -62,6 +62,25 @@ def cast_ray(piece, board, direction):
     return legal_squares
 
 
+def castling_path_clear(king, rook, board, direction):
+    """Similar to cast_ray, but this will return True if there are no pieces between
+    the start (king) and end (rook) coordinates.
+    """
+    dx, dy = step(king.x, king.y, direction)
+
+    while (dx, dy) in board.square_coordinates():
+        target = board.piece_in_square(dx, dy)
+
+        if not target:
+            dx, dy = step(dx, dy, direction)
+
+        elif target == rook:
+            return True
+
+        else:
+            return False
+
+
 def step(x, y, direction):
     """Returns the coordinates a step in a given direction away from the origin.
     """
