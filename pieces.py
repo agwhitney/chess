@@ -169,10 +169,10 @@ class King(Piece):
         """
         danger_zone = []
         for piece in pieces:
-            if piece.color == self.color or piece == self:
+            if piece.color == self.color:
                 continue
 
-            elif piece.name == 'Pawn':
+            if piece.name == 'Pawn':
                 danger_zone.extend(piece.legal_moves(board, only_diagonals=True))
 
             else:
