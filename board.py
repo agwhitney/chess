@@ -1,4 +1,4 @@
-from game_states import Team, switch_teams
+from teams import Team, switch_teams
 from square import Square
 from itertools import product
 

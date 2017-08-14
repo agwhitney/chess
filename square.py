@@ -1,4 +1,4 @@
-from game_states import Team
+from teams import Team
 
 
 class Square:

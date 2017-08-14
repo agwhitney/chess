@@ -1,7 +1,7 @@
 """Piece class and the subclasses for each piece, and the initialize_pieces function for placing the
 pieces at the beginning of the game.
 """
-from game_states import Team
+from teams import Team
 from cast_ray import cardinals, ordinals, radial, step
 
 
@@ -24,14 +24,6 @@ class Piece:
 
     def __repr__(self):
         return "<{} {} at ({}, {})>".format(self.color, self.name, self.x, self.y)
-
-    def move(self, x2, y2, board):
-        self.x = x2
-        self.y = y2
-
-        target = board.piece_in_square(x2, y2)
-        if target:
-            target.captured = True  # Friendly check handled in legal_moves
 
 
 class Pawn(Piece):
@@ -135,9 +127,8 @@ class Bishop(Piece):
 
 
 class King(Piece):
-    def __init__(self, x, y, color, checked=False):
+    def __init__(self, x, y, color):
         super().__init__(x, y, color, 'King', '[K]')
-        self.checked = checked
 
     def legal_moves(self, board):
         """Added explicitly then removed as appropriate.
@@ -162,6 +153,8 @@ class King(Piece):
 
             if square in board.square_coordinates():
                 legal_squares.append(square)
+
+        return legal_squares
 
     def in_check(self, board, pieces):
         """Checks whether or not a king is in check at its position by creating a list of dangerous squares
@@ -190,6 +183,7 @@ class Queen(Piece):
         return radial(self, board)
 
 
+# Utilities
 def initialize_pieces():
     pieces = []
 
