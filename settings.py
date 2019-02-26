@@ -1,0 +1,10 @@
+TITLE = "Chess"
+
+TILESIZE = 64
+WIDTH = TILESIZE * 8
+HEIGHT = TILESIZE * 8
+FPS = 60
+
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
