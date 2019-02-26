@@ -1,7 +1,11 @@
 import pygame as pg
 
+from os import path
+
+from board import Board
 from settings import *
 from sprites import *
+
 
 class Game:
     def __init__(self):
@@ -13,19 +17,30 @@ class Game:
         self.load_data()
 
     def load_data(self):
-        pass
+        game_dir = path.dirname(__file__)
+        board_file = path.join(game_dir, 'board_setup.txt')
+        self.image_path = path.join(game_dir, 'images')
+
+        self.board = Board(board_file)
 
     def new(self):
         self.all_sprites = pg.sprite.Group()
+        self.white_team = pg.sprite.Group()
+        self.black_team = pg.sprite.Group()
 
-        # Draw a board
         flip = True
-        for row in range(8):
+        for row, squares in enumerate(self.board.data):
             flip = not flip
-            for col in range(8):
-                color = WHITE if flip else BLACK
+            for col, square in enumerate(squares):
+                color = ORANGE if flip else BLUE
                 pg.draw.rect(self.screen, color, (row * TILESIZE, col * TILESIZE, TILESIZE, TILESIZE))
                 flip = not flip
+
+                if square == 'WP':
+                    Pawn(self, 'white', row, col)
+                elif square == 'BP':
+                    Pawn(self, 'black', row, col)
+
 
     def run(self):
         self.playing = True
@@ -49,7 +64,7 @@ class Game:
             pg.draw.line(self.screen, RED, (0, y), (WIDTH, y))
 
     def draw(self):
-        self.draw_grid()
+        # self.draw_grid()
         for sprite in self.all_sprites:
             self.screen.blit(sprite.image, sprite.pos)
         pg.display.flip()
@@ -61,6 +76,7 @@ class Game:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
                     self.quit()
+
 
 if __name__ == '__main__':
     g = Game()

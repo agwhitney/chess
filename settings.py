@@ -1,10 +1,27 @@
 TITLE = "Chess"
 
-TILESIZE = 64
+BOARD_SETUP_MAP = 'board_setup.txt'
+
+TILESIZE = 128
 WIDTH = TILESIZE * 8
 HEIGHT = TILESIZE * 8
 FPS = 60
 
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
+ORANGE = (255, 120, 120)
+BLUE = (0, 100, 200)
+
+# White images
+WHITE_KING = 'white_king.png'
+WHITE_QUEEN = 'white_queen.png'
+WHITE_BISHOP = 'white_bishop.png'
+WHITE_KNIGHT = 'white_knight.png'
+WHITE_ROOK = 'white_rook.png'
+WHITE_PAWN = 'white_pawn.png'
+
+# Black images
+BLACK_KING = 'black_king.png'
+BLACK_QUEEN = 'black_queen.png'
+BLACK_BISHOP = 'black_bishop.png'
+BLACK_KNIGHT = 'black_knight.png'
+BLACK_ROOK = 'black_rook.png'
+BLACK_PAWN = 'black_pawn.png'
