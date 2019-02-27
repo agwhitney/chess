@@ -1,22 +1,16 @@
-from teams import Team
+import pygame as pg
+vec = pg.math.Vector2
+
+from settings import *
 
 
-class Square:
-    """The Squares that make up the board.
-    Doesn't really need x or y attributes, because they're generated as a list of lists (so it
-    pretty much does that anyway) and called like that. Keeping it for now because it's useful
-    for sanity-checks.
-    """
-    def __init__(self, x, y, color, piece_present=None):
-        self.x = x
-        self.y = y
+class Square(pg.sprite.Sprite):
+    def __init__(self, game, color, x, y):
+        self.groups = game.all_sprites, game.board_squares
+        super().__init__(self.groups)
+
         self.color = color
-        self.piece_present = piece_present  # This is updated in draw_board and used for casting rays
-
-        if color == Team.WHITE:
-            self.symbol = '[ ]'
-        elif color == Team.BLACK:
-            self.symbol = '[/]'
-
-    def __repr__(self):
-        return "<{} Square at ({}, {})>".format(self.color, self.x, self.y)
+        self.pos = vec(x, y) * TILESIZE
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.rect = self.image.fill(color)
+        self.rect.topleft = self.pos

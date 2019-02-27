@@ -8,79 +8,55 @@ from settings import *
 
 class Piece(pg.sprite.Sprite):
     def __init__(self, game, team, x, y):
-        if team == 'white':
-            self.team = team
-            self.groups = game.all_sprites, game.white_team
-        else:
-            self.team = team
-            self.groups = game.all_sprites, game.black_team
+        self.groups = game.all_sprites, game.all_pieces, game.team_sprites[team]
         super().__init__(self.groups)
 
         self.pos = vec(x, y) * TILESIZE
         self.rect = pg.Rect(x, y, TILESIZE, TILESIZE)
+        self.rect.topleft = self.pos
+
+    def move(self, destination):
+        self.pos = destination.pos
+        self.rect.topleft = destination.rect.topleft
 
 
 class Pawn(Piece):
     def __init__(self, game, team, x, y):
         super().__init__(game, team, x, y)
-
-        if team == 'white':
-            self.image = pg.image.load(path.join(game.image_path, WHITE_PAWN))
-        else:
-            self.image = pg.image.load(path.join(game.image_path, BLACK_PAWN))
+        self.image = pg.image.load(game.pawn_img[team])
         self.image = pg.transform.scale(self.image, (TILESIZE, TILESIZE))
 
 
 class King(Piece):
     def __init__(self, game, team, x, y):
         super().__init__(game, team, x, y)
-
-        if team == 'white':
-            self.image = pg.image.load(path.join(game.image_path, WHITE_KING))
-        else:
-            self.image = pg.image.load(path.join(game.image_path, BLACK_KING))
+        self.image = pg.image.load(game.king_img[team])
         self.image = pg.transform.scale(self.image, (TILESIZE, TILESIZE))
 
 
 class Queen(Piece):
     def __init__(self, game, team, x, y):
         super().__init__(game, team, x, y)
-
-        if team == 'white':
-            self.image = pg.image.load(path.join(game.image_path, WHITE_QUEEN))
-        else:
-            self.image = pg.image.load(path.join(game.image_path, BLACK_QUEEN))
+        self.image = pg.image.load(game.queen_img[team])
         self.image = pg.transform.scale(self.image, (TILESIZE, TILESIZE))
 
 
 class Bishop(Piece):
     def __init__(self, game, team, x, y):
         super().__init__(game, team, x, y)
-
-        if team == 'white':
-            self.image = pg.image.load(path.join(game.image_path, WHITE_BISHOP))
-        else:
-            self.image = pg.image.load(path.join(game.image_path, BLACK_BISHOP))
+        self.image = pg.image.load(game.bishop_img[team])
         self.image = pg.transform.scale(self.image, (TILESIZE, TILESIZE))
 
 
 class Knight(Piece):
     def __init__(self, game, team, x, y):
         super().__init__(game, team, x, y)
-
-        if team == 'white':
-            self.image = pg.image.load(path.join(game.image_path, WHITE_KNIGHT))
-        else:
-            self.image = pg.image.load(path.join(game.image_path, BLACK_KNIGHT))
+        self.image = pg.image.load(game.knight_img[team])
         self.image = pg.transform.scale(self.image, (TILESIZE, TILESIZE))
 
 
 class Rook(Piece):
     def __init__(self, game, team, x, y):
         super().__init__(game, team, x, y)
-
-        if team == 'white':
-            self.image = pg.image.load(path.join(game.image_path, WHITE_ROOK))
-        else:
-            self.image = pg.image.load(path.join(game.image_path, BLACK_ROOK))
+        self.image = pg.image.load(game.rook_img[team])
         self.image = pg.transform.scale(self.image, (TILESIZE, TILESIZE))

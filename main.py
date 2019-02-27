@@ -5,6 +5,7 @@ from os import path
 from board import Board
 from settings import *
 from sprites import *
+from square import Square
 
 
 class Game:
@@ -19,14 +20,24 @@ class Game:
     def load_data(self):
         game_dir = path.dirname(__file__)
         board_file = path.join(game_dir, 'board_setup.txt')
-        self.image_path = path.join(game_dir, 'images')
+        image_path = path.join(game_dir, 'images')
 
         self.board = Board(board_file)
+        self.pawn_img = {'white': path.join(image_path, WHITE_PAWN), 'black': path.join(image_path, BLACK_PAWN)}
+        self.king_img = {'white': path.join(image_path, WHITE_KING), 'black': path.join(image_path, BLACK_KING)}
+        self.queen_img = {'white': path.join(image_path, WHITE_QUEEN), 'black': path.join(image_path, BLACK_QUEEN)}
+        self.bishop_img = {'white': path.join(image_path, WHITE_BISHOP), 'black': path.join(image_path, BLACK_BISHOP)}
+        self.knight_img = {'white': path.join(image_path, WHITE_KNIGHT), 'black': path.join(image_path, BLACK_KNIGHT)}
+        self.rook_img = {'white': path.join(image_path, WHITE_ROOK), 'black': path.join(image_path, BLACK_ROOK)}
 
     def new(self):
         self.all_sprites = pg.sprite.Group()
+        self.all_pieces = pg.sprite.Group()
         self.white_team = pg.sprite.Group()
         self.black_team = pg.sprite.Group()
+        self.team_sprites = {'white': self.white_team, 'black': self.black_team}
+        self.board_squares = pg.sprite.Group()
+        self.piece_selected = None
 
         flip = True
         for row, squares in enumerate(self.board.data):
@@ -34,7 +45,7 @@ class Game:
             for col, square in enumerate(squares):
                 # Draw board squares
                 color = ORANGE if flip else BLUE
-                pg.draw.rect(self.screen, color, (row * TILESIZE, col * TILESIZE, TILESIZE, TILESIZE))
+                Square(self, color, col, row)
                 flip = not flip
 
                 # Draw pieces
@@ -91,6 +102,21 @@ class Game:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
                     self.quit()
+
+            if event.type == pg.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    if self.piece_selected is None:
+                        for piece in self.all_pieces:
+                            if piece.rect.collidepoint(event.pos):
+                                self.piece_selected = piece
+
+                    elif self.piece_selected is not None:
+                        for square in self.board_squares:
+                            if square.rect.collidepoint(event.pos):
+                                self.piece_selected.move(square)
+                                self.piece_selected = None
+                print(type(self.piece_selected))
+
 
 
 if __name__ == '__main__':
