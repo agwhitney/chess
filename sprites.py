@@ -29,3 +29,58 @@ class Pawn(Piece):
         else:
             self.image = pg.image.load(path.join(game.image_path, BLACK_PAWN))
         self.image = pg.transform.scale(self.image, (TILESIZE, TILESIZE))
+
+
+class King(Piece):
+    def __init__(self, game, team, x, y):
+        super().__init__(game, team, x, y)
+
+        if team == 'white':
+            self.image = pg.image.load(path.join(game.image_path, WHITE_KING))
+        else:
+            self.image = pg.image.load(path.join(game.image_path, BLACK_KING))
+        self.image = pg.transform.scale(self.image, (TILESIZE, TILESIZE))
+
+
+class Queen(Piece):
+    def __init__(self, game, team, x, y):
+        super().__init__(game, team, x, y)
+
+        if team == 'white':
+            self.image = pg.image.load(path.join(game.image_path, WHITE_QUEEN))
+        else:
+            self.image = pg.image.load(path.join(game.image_path, BLACK_QUEEN))
+        self.image = pg.transform.scale(self.image, (TILESIZE, TILESIZE))
+
+
+class Bishop(Piece):
+    def __init__(self, game, team, x, y):
+        super().__init__(game, team, x, y)
+
+        if team == 'white':
+            self.image = pg.image.load(path.join(game.image_path, WHITE_BISHOP))
+        else:
+            self.image = pg.image.load(path.join(game.image_path, BLACK_BISHOP))
+        self.image = pg.transform.scale(self.image, (TILESIZE, TILESIZE))
+
+
+class Knight(Piece):
+    def __init__(self, game, team, x, y):
+        super().__init__(game, team, x, y)
+
+        if team == 'white':
+            self.image = pg.image.load(path.join(game.image_path, WHITE_KNIGHT))
+        else:
+            self.image = pg.image.load(path.join(game.image_path, BLACK_KNIGHT))
+        self.image = pg.transform.scale(self.image, (TILESIZE, TILESIZE))
+
+
+class Rook(Piece):
+    def __init__(self, game, team, x, y):
+        super().__init__(game, team, x, y)
+
+        if team == 'white':
+            self.image = pg.image.load(path.join(game.image_path, WHITE_ROOK))
+        else:
+            self.image = pg.image.load(path.join(game.image_path, BLACK_ROOK))
+        self.image = pg.transform.scale(self.image, (TILESIZE, TILESIZE))
