@@ -1,8 +1,11 @@
+from pygame.math import Vector2 as vec
+
+
 TITLE = "Chess"
 
 BOARD_SETUP_MAP = 'board_setup.txt'
 
-TILESIZE = 128
+TILESIZE = 64
 WIDTH = TILESIZE * 8
 HEIGHT = TILESIZE * 8
 FPS = 60
@@ -26,3 +29,9 @@ BLACK_BISHOP = 'black_bishop.png'
 BLACK_KNIGHT = 'black_knight.png'
 BLACK_ROOK = 'black_rook.png'
 BLACK_PAWN = 'black_pawn.png'
+
+# Direction unit vectors
+UP = vec(0, -1) * TILESIZE
+DOWN = vec(0, 1) * TILESIZE
+LEFT = vec(-1, 0) * TILESIZE
+RIGHT = vec(1, 0) * TILESIZE
