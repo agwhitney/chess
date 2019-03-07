@@ -4,7 +4,7 @@ from os import path
 
 from board import Board
 from settings import *
-from sprites import *
+from pieces import *
 from square import Square
 
 

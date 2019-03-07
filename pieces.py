@@ -1,221 +1,199 @@
-"""Piece class and the subclasses for each piece, and the initialize_pieces function for placing the
-pieces at the beginning of the game.
-"""
-from teams import Team
-from cast_ray import cardinals, ordinals, radial, step
+import pygame as pg
+vec = pg.math.Vector2
+
+from settings import *
 
 
-class Piece:
-    """Piece object containing properties about the pieces.
-    Child classes contain the legal moves; Parent class contains the move function.
-    """
-    def __init__(self, x, y, color, name, symbol, moves_made=0, captured=False):
-        self.x = x
-        self.y = y
-        self.color = color
-        self.name = name
-        self.moves_made = moves_made
-        self.captured = captured
+def piece_at_pos(game, pos):
+    for piece in game.all_pieces:
+        if piece.pos == pos:
+            return piece
+    return None
 
-        if self.color == Team.BLACK:
-            self.symbol = symbol.lower()
-        else:
-            self.symbol = symbol
 
-    def __repr__(self):
-        return "<{} {} at ({}, {})>".format(self.color, self.name, self.x, self.y)
+class Piece(pg.sprite.Sprite):
+    def __init__(self, game, team, x, y):
+        self.groups = game.all_sprites, game.all_pieces, game.team_sprites[team]
+        super().__init__(self.groups)
+
+        self.team = team
+        self.move_count = 0
+        self.legal_moves = []
+
+        self.pos = vec(x, y) * TILESIZE
+        self.rect = pg.Rect(x, y, TILESIZE, TILESIZE)
+        self.rect.topleft = self.pos
+
+    def move(self, destination):
+        self.pos = destination.pos
+        self.rect.topleft = destination.rect.topleft
+        self.move_count += 1
+
+    def generate_moves(self, game):
+        return []
 
 
 class Pawn(Piece):
-    def __init__(self, x, y, color, passant=False):
-        super().__init__(x, y, color, 'Pawn', '[P]')
-        self.passant = passant
+    def __init__(self, game, team, x, y):
+        super().__init__(game, team, x, y)
+        self.name = 'pawn'
+        self.image = pg.image.load(game.pawn_img[team])
+        self.image = pg.transform.scale(self.image, (TILESIZE, TILESIZE))
 
-    def legal_moves(self, board, only_diagonals=False):
-        legal_squares = []
-        forward = 'north' if self.color == Team.WHITE else 'south'
+    def generate_moves(self, game):
+        moves = []
+        start = vec(self.pos)
+        forward = UP if self.team == 'white' else DOWN
 
-        # Forward Step
-        one_step = step(self.x, self.y, forward)
-        if not board.piece_in_square(one_step[0], one_step[1]):
-            legal_squares.append(one_step)
+        # One step
+        test = start + forward
+        piece = piece_at_pos(game, test)
+        if not piece:
+            moves.append(vec(test))
+            # Two step
+            if self.move_count == 0:
+                test += forward
+                piece = piece_at_pos(game, test)
+                if not piece:
+                    moves.append(vec(test))
 
-        # First Turn Two-Step
-        if self.moves_made == 0:
-            two_step = step(one_step[0], one_step[1], forward)
-            legal_squares.append(two_step)
-            self.passant = True
+        # Diagonal capture
+        for test in (start + forward + RIGHT, start + forward + LEFT):
+            piece = piece_at_pos(game, test)
+            if piece:
+                if piece.team != self.team:
+                    moves.append(vec(test))
 
-        # Diagonal Captures, including Passant Captures
-        for side in ['east', 'west']:
-            # Diagonal
-            diagonal = step(self.x, self.y, forward + side)
-            target_dgnl = board.piece_in_square(diagonal[0], diagonal[1])
-            if target_dgnl:
-                if target_dgnl.color != self.color:
-                    legal_squares.append(diagonal)
+        # # Passant
+        # else:
+        #     if piece.team != self.team and piece.name == 'pawn' and piece.move_count == 1:
+        #         moves.append(test + LEFT)
+        #         moves.append(test + RIGHT)
 
-            # Passant
-            lateral = step(self.x, self.y, side)
-            target_lat = board.piece_in_square(lateral[0], lateral[1])
-            if target_lat:
-                if target_lat.name == 'Pawn' and target_lat.passant is True and target_lat.color != self.color:
-                    legal_squares.append(diagonal)
-                    target_lat.captured = True
-
-        # Remove non-diagonal squares (used for check checking)
-        if only_diagonals is True:
-            for square in legal_squares:
-                if square[1] == self.y:
-                    legal_squares.remove(square)
-
-        return legal_squares
-
-    # def promote(self, pieces):
-    #     """Removes this piece and replaces it with a desired piece.
-    #     Desired piece is a queen right now no matter what, but who doesn't want a queen?
-    #     What are they gonna have instead? A knight? Might as well just have another king
-    #     since they're probably gonna lose anyway.
-    #     """
-
-
-class Rook(Piece):
-    def __init__(self, x, y, color):
-        super().__init__(x, y, color, 'Rook', '[R]')
-
-    def legal_moves(self, board):
-        return cardinals(self, board)
-
-
-class Knight(Piece):
-    def __init__(self, x, y, color):
-        super().__init__(x, y, color, 'Knight', '[N]')
-
-    def legal_moves(self, board):
-        """Legal squares determined by taking all the options as a list, then removing options
-        as necessary (i.e. not in board or team-occupied) and returning a new list.
-        """
-        potential_squares = [
-            (self.x + 2, self.y + 1),
-            (self.x + 2, self.y - 1),
-            (self.x - 2, self.y + 1),
-            (self.x - 2, self.y - 1),
-            (self.x + 1, self.y + 2),
-            (self.x - 1, self.y + 2),
-            (self.x + 1, self.y - 2),
-            (self.x - 1, self.y - 2)
-        ]
-        legal_squares = []
-        for square in potential_squares:
-            target = board.piece_in_square(square[0], square[1])
-            if target:
-                if target.color != self.color:
-                    legal_squares.append(square)
-
-            if square in board.square_coordinates():
-                legal_squares.append(square)
-
-        return legal_squares
-
-
-class Bishop(Piece):
-    def __init__(self, x, y, color):
-        super().__init__(x, y, color, 'Bishop', '[B]')
-
-    def legal_moves(self, board):
-        return ordinals(self, board)
+        self.legal_moves = moves
 
 
 class King(Piece):
-    def __init__(self, x, y, color):
-        super().__init__(x, y, color, 'King', '[K]')
+    def __init__(self, game, team, x, y):
+        super().__init__(game, team, x, y)
+        self.name = 'king'
+        self.image = pg.image.load(game.king_img[team])
+        self.image = pg.transform.scale(self.image, (TILESIZE, TILESIZE))
 
-    def legal_moves(self, board):
-        """Added explicitly then removed as appropriate.
-        Checks are (will be) determined at the end of a turn in a separate place
-        """
-        potential_squares = [
-            step(self.x, self.y, 'north'),
-            step(self.x, self.y, 'south'),
-            step(self.x, self.y, 'east'),
-            step(self.x, self.y, 'west'),
-            step(self.x, self.y, 'northeast'),
-            step(self.x, self.y, 'northwest'),
-            step(self.x, self.y, 'southeast'),
-            step(self.x, self.y, 'southwest'),
-        ]
-        legal_squares = []
-        for square in potential_squares:
-            target = board.piece_in_square(square[0], square[1])
-            if target:
-                if self.color != target.color:
-                    legal_squares.append(square)
+    def generate_moves(self, game):
+        moves = []
+        start = vec(self.pos)
 
-            if square in board.square_coordinates():
-                legal_squares.append(square)
-
-        return legal_squares
-
-    def in_check(self, board, pieces):
-        """Checks whether or not a king is in check at its position by creating a list of dangerous squares
-        and seeing if the king is in them.
-        """
-        danger_zone = []
-        for piece in pieces:
-            if piece.color == self.color:
-                continue
-
-            if piece.name == 'Pawn':
-                danger_zone.extend(piece.legal_moves(board, only_diagonals=True))
-
+        for d in CARDINALS + ORDINALS:
+            test = start + d
+            piece = piece_at_pos(game, test)
+            if piece:
+                if piece.team != self.team:
+                    moves.append(vec(test))
             else:
-                danger_zone.extend(piece.legal_moves(board))
-
-        if (self.x, self.y) in danger_zone:
-            return True
+                moves.append(vec(test))
+        self.legal_moves = moves
 
 
 class Queen(Piece):
-    def __init__(self, x, y, color):
-        super().__init__(x, y, color, 'Queen', '[Q]')
+    def __init__(self, game, team, x, y):
+        super().__init__(game, team, x, y)
+        self.name = 'queen'
+        self.image = pg.image.load(game.queen_img[team])
+        self.image = pg.transform.scale(self.image, (TILESIZE, TILESIZE))
 
-    def legal_moves(self, board):
-        return radial(self, board)
+    def generate_moves(self, game):
+        moves = []
+        start = vec(self.pos)
 
-
-# Utilities
-def initialize_pieces():
-    pieces = []
-
-    for x in range(8):
-        pieces.append(Pawn(x, 1, Team.BLACK))
-        pieces.append(Pawn(x, 6, Team.WHITE))
-
-        if x == 0 or x == 7:
-            pieces.append(Rook(x, 0, Team.BLACK))
-            pieces.append(Rook(x, 7, Team.WHITE))
-
-        if x == 1 or x == 6:
-            pieces.append(Knight(x, 0, Team.BLACK))
-            pieces.append(Knight(x, 7, Team.WHITE))
-
-        if x == 2 or x == 5:
-            pieces.append(Bishop(x, 0, Team.BLACK))
-            pieces.append(Bishop(x, 7, Team.WHITE))
-
-        if x == 3:
-            pieces.append(Queen(x, 0, Team.BLACK))
-            pieces.append(Queen(x, 7, Team.WHITE))
-
-        if x == 4:
-            pieces.append(King(x, 0, Team.BLACK))
-            pieces.append(King(x, 7, Team.WHITE))
-
-    return pieces
+        for d in CARDINALS + ORDINALS:
+            test = start + d
+            while 0 <= test.x < WIDTH and 0 <= test.y < HEIGHT:
+                piece = piece_at_pos(game, test)
+                if piece:
+                    if piece.team != self.team:
+                        moves.append(vec(test))
+                    break
+                else:
+                    moves.append(vec(test))
+                test += d
+        self.legal_moves = moves
 
 
-def return_king(pieces, player_turn):
-    """Returns the player's king"""
-    for piece in pieces:
-        if piece.color == player_turn and piece.name == 'King':
-            return piece
+class Bishop(Piece):
+    def __init__(self, game, team, x, y):
+        super().__init__(game, team, x, y)
+        self.name = 'bishop'
+        self.image = pg.image.load(game.bishop_img[team])
+        self.image = pg.transform.scale(self.image, (TILESIZE, TILESIZE))
+
+    def generate_moves(self, game):
+        moves = []
+        start = vec(self.pos)
+
+        for d in ORDINALS:
+            test = start + d
+            while 0 <= test.x < WIDTH and 0 <= test.y < HEIGHT:
+                piece = piece_at_pos(game, test)
+                if piece:
+                    if piece.team != self.team:
+                        moves.append(vec(test))
+                    break
+                else:
+                    moves.append(vec(test))
+                test += d
+        self.legal_moves = moves
+
+
+class Knight(Piece):
+    def __init__(self, game, team, x, y):
+        super().__init__(game, team, x, y)
+        self.name = 'knight'
+        self.image = pg.image.load(game.knight_img[team])
+        self.image = pg.transform.scale(self.image, (TILESIZE, TILESIZE))
+
+    def generate_moves(self, game):
+        moves = []
+        start = vec(self.pos)
+        tests = [start + UP + UP + LEFT,
+                     start + UP + UP + RIGHT,
+                     start + DOWN + DOWN + LEFT,
+                     start + DOWN + DOWN + RIGHT,
+                     start + LEFT + LEFT + UP,
+                     start + LEFT + LEFT + DOWN,
+                     start + RIGHT + RIGHT + UP,
+                     start + RIGHT + RIGHT + DOWN
+                     ]
+        for test in tests:
+            piece = piece_at_pos(game, test)
+            if piece:
+                if piece.team != self.team:
+                    moves.append(vec(test))
+            else:
+                moves.append(vec(test))
+        self.legal_moves = moves
+
+
+class Rook(Piece):
+    def __init__(self, game, team, x, y):
+        super().__init__(game, team, x, y)
+        self.name = 'rook'
+        self.image = pg.image.load(game.rook_img[team])
+        self.image = pg.transform.scale(self.image, (TILESIZE, TILESIZE))
+
+    def generate_moves(self, game):
+        moves = []
+        start = vec(self.pos)
+
+        for d in CARDINALS:
+            test = start + d
+            while 0 <= test.x < WIDTH and 0 <= test.y < HEIGHT:
+                piece = piece_at_pos(game, test)
+                if piece:
+                    if piece.team != self.team:
+                        moves.append(vec(test))
+                    break
+                else:
+                    moves.append(vec(test))
+                test += d
+        self.legal_moves = moves
