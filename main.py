@@ -92,11 +92,17 @@ class Game:
             pg.draw.line(self.screen, BLACK, (0, y), (WIDTH, y), 2)
 
     def draw(self):
-        self.draw_grid()
         for sprite in self.board_squares:
             self.screen.blit(sprite.image, sprite.pos)
         for sprite in self.all_pieces:
             self.screen.blit(sprite.image, sprite.pos)
+        if self.piece_selected:
+            for square in self.piece_selected.legal_moves:
+                a = pg.Surface((TILESIZE, TILESIZE))
+                a.set_alpha(150)
+                a.fill(PURPLE)
+                self.screen.blit(a, (square.x, square.y))
+        self.draw_grid()
         pg.display.flip()
 
     def events(self):

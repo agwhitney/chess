@@ -10,9 +10,10 @@ WIDTH = TILESIZE * 8
 HEIGHT = TILESIZE * 8
 FPS = 60
 
-BLACK = (0, 0, 0)
-ORANGE = (255, 120, 120)
-BLUE = (0, 100, 200)
+BLACK = (0, 0, 0, 255)
+ORANGE = (255, 120, 120, 255)
+BLUE = (0, 100, 200, 255)
+PURPLE = (150, 0, 150, 50)
 
 # White images
 WHITE_KING = 'white_king.png'
